@@ -9,7 +9,12 @@ const bookSchema = new mongoose.Schema({
   authorId: { type: mongoose.Schema.Types.ObjectId, ref: Author, required: true },
   blurb: { type: String },
   publicationYear: { type: Number, required: true },
-  pageCount: { type: Number, required: true }
+  pageCount: { type: Number, required: true },
+  authorId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'authors',
+    required: true,
+  },
 });
 
 
