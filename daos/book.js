@@ -5,22 +5,25 @@ const Book = require('../models/book');
 module.exports = {};
 
 module.exports.getAll = (page, perPage, query) => {
-  if(query) {
-    return Book.find({ 
-      $text: { $search: query } },
-      { score: { $meta: 'textScore'}}
-    ).sort({ score: { $meta: 'textScore'}}).limit(perPage).skip(perPage*page).lean();
+  if (query) {
+    return Book.find({ authorId: query })
+      .limit(perPage)
+      .skip(perPage * page)
+      .lean();
   } else {
-    return Book.find().limit(perPage).skip(perPage*page).lean();
+    return Book.find()
+      .limit(perPage)
+      .skip(perPage * page)
+      .lean();
   }
-}
+};
 
 module.exports.getById = (bookId) => {
   if (!mongoose.Types.ObjectId.isValid(bookId)) {
     return null;
   }
   return Book.findOne({ _id: bookId }).lean();
-}
+};
 
 module.exports.deleteById = async (bookId) => {
   if (!mongoose.Types.ObjectId.isValid(bookId)) {
@@ -28,7 +31,7 @@ module.exports.deleteById = async (bookId) => {
   }
   await Book.deleteOne({ _id: bookId });
   return true;
-}
+};
 
 module.exports.updateById = async (bookId, newObj) => {
   if (!mongoose.Types.ObjectId.isValid(bookId)) {
@@ -36,7 +39,7 @@ module.exports.updateById = async (bookId, newObj) => {
   }
   await Book.updateOne({ _id: bookId }, newObj);
   return true;
-}
+};
 
 module.exports.create = async (bookData) => {
   try {
@@ -48,7 +51,7 @@ module.exports.create = async (bookData) => {
     }
     throw e;
   }
-}
+};
 
-class BadDataError extends Error {};
+class BadDataError extends Error {}
 module.exports.BadDataError = BadDataError;
