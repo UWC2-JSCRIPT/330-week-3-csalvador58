@@ -35,14 +35,30 @@ router.get("/:id", async (req, res, next) => {
 // Read - all books
 router.get("/", async (req, res, next) => {
   let { page, perPage } = req.query;
-  let query = req.query.authorId
-  // console.log('query')
-  // console.log(query)
+  let query = req.query.authorId ? req.query.authorId : null;
+  console.log('query')
+  console.log(query)
   page = page ? Number(page) : 0;
   perPage = perPage ? Number(perPage) : 10;
   const books = await bookDAO.getAll(page, perPage, query);
+  console.log('books')
+  console.log(books)
   res.json(books);
 });
+
+// // Search
+// router.get("/search", async (req, res, next) => {
+//   // let { page, perPage } = req.query;
+//   const searchQuery = req.query.query;
+//   console.log('searchQuery')
+//   console.log(searchQuery)
+
+
+//   // page = page ? Number(page) : 0;
+//   // perPage = perPage ? Number(perPage) : 10;
+//   // const books = await bookDAO.getSearch(page, perPage);
+//   // res.json(books);
+// });
 
 // Update
 router.put("/:id", async (req, res, next) => {
