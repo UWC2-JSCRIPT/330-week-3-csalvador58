@@ -13,7 +13,10 @@ module.exports.getAll = async (page, perPage, query) => {
   // console.log(query);
   if (query) {
     // console.log('Process query');
-    const books = await Book.find({ authorId: query }).limit(perPage).skip(perPage * page).lean();
+    const books = await Book.find({ authorId: query })
+      .limit(perPage)
+      .skip(perPage * page)
+      .lean();
     // console.log('DAOS - books');
     // console.log(books);
     return books;
@@ -25,6 +28,14 @@ module.exports.getAll = async (page, perPage, query) => {
       .lean();
     return books;
   }
+};
+
+module.exports.getById = async (bookId) => {
+  if (!mongoose.Types.ObjectId.isValid(bookId)) {
+    return null;
+  }
+  const book = await Book.findOne({ _id: bookId }).lean();
+  return book;
 };
 
 // Search
@@ -45,12 +56,29 @@ module.exports.getSearch = async (page, perPage, searchQuery) => {
   return null;
 };
 
-module.exports.getById = async (bookId) => {
-  if (!mongoose.Types.ObjectId.isValid(bookId)) {
-    return null;
-  }
-  const book = await Book.findOne({ _id: bookId }).lean();
-  return book;
+module.exports.getStats = async () => {
+  const statsByAuthor = Book.aggregate([
+    {
+      $group: {
+        _id: '$authorId', // Group key
+        averagePageCount: { $avg: '$pageCount' }, // use $avg accumulator operator for average
+        numBooks: { $count: {} }, // use $count accumulator operator to total documents in group
+        titles: { $push: '$title' }, // use $push accumulator op to include array of titles
+      },
+    },
+    {
+      $project: {
+        // project to specify fields to include/remove
+        _id: 0, // remove _id field
+        authorId: '$_id', // update _id to authorId
+        averagePageCount: 1, // include field
+        numBooks: 1, // include field
+        titles: 1, // include field
+      },
+    },
+  ]);
+
+  return statsByAuthor;
 };
 
 module.exports.deleteById = async (bookId) => {

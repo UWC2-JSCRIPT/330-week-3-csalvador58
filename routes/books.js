@@ -5,7 +5,7 @@ const bookDAO = require('../daos/book');
 
 // Create
 router.post("/", async (req, res, next) => {
-  console.log('post')
+  console.log('post /')
   const book = req.body;
   if (!book || JSON.stringify(book) === '{}' ) {
     res.status(400).send('book is required');
@@ -49,8 +49,18 @@ router.get("/", async (req, res, next) => {
   res.json(books);
 });
 
+// Stats
+router.get("/authors/stats", async (req, res, next) => {
+  console.log('get /authors/stats')
+  const statsByAuthor = await bookDAO.getStats();
+  console.log('statsByAuthor')
+  console.log(statsByAuthor)
+  res.json(statsByAuthor);
+})
+
 // Search
 router.get("/search", async (req, res, next) => {
+  console.log('get /search')
   let { page, perPage } = req.query;
   const searchQuery = req.query.query;
   // console.log('searchQuery')
@@ -59,7 +69,11 @@ router.get("/search", async (req, res, next) => {
   page = page ? Number(page) : 0;
   perPage = perPage ? Number(perPage) : 10;
   const books = await bookDAO.getSearch(page, perPage, searchQuery);
-  res.json(books);
+  if(books.length > 0) {
+    res.json(books);
+  } else {
+    res.status(500).send("No book was found");
+  }
 });
 
 // Update
