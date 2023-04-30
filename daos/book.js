@@ -27,23 +27,23 @@ module.exports.getAll = async (page, perPage, query) => {
   }
 };
 
-// // Search
-// module.exports.getSearch = (page, perPage, searchQuery) => {
-//   console.log("DAOS - searchQuery")
-//   console.log(searchQuery)
-//   if (searchQuery) {
-//     Book.createIndexes({ title: 'text', genre: 'text', blurb: 'text' });
-//     const results = Book.find(
-//       { $text: { $search: searchQuery } },
-//       { score: { $meta: 'textScore' } }
-//     ).sort({ score: { $meta: 'textScore' } });
-//     console.log('results');
-//     console.log(results);
-//     return null;
-//   }
+// Search
+module.exports.getSearch = async (page, perPage, searchQuery) => {
+  // console.log("DAOS - searchQuery")
+  // console.log(searchQuery)
+  if (searchQuery) {
+    // console.log('Searching for query...')
+    const searchResults = await Book.find(
+      { $text: { $search: searchQuery } },
+      { score: { $meta: 'textScore' } }
+    ).sort({ score: { $meta: 'textScore' } });
+    // console.log('searchResults');
+    // console.log(searchResults);
+    return searchResults;
+  }
 
-//   return null;
-// };
+  return null;
+};
 
 module.exports.getById = async (bookId) => {
   if (!mongoose.Types.ObjectId.isValid(bookId)) {
