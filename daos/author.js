@@ -4,15 +4,17 @@ const Author = require('../models/author');
 
 module.exports = {};
 
-module.exports.getAll = (page, perPage) => {
-  return Author.find().limit(perPage).skip(perPage*page).lean();
+module.exports.getAll = async (page, perPage) => {
+  const authors = Author.find().limit(perPage).skip(perPage*page).lean();
+  return authors;
 }
 
-module.exports.getById = (authorId) => {
+module.exports.getById = async (authorId) => {
   if (!mongoose.Types.ObjectId.isValid(authorId)) {
     return null;
   }
-  return Author.findOne({ _id: authorId }).lean();
+  const author = await Author.findOne({ _id: authorId }).lean();
+  return author;
 }
 
 module.exports.deleteById = async (authorId) => {
@@ -33,8 +35,8 @@ module.exports.updateById = async (authorId, newObj) => {
 
 module.exports.create = async (authorData) => {
   try {
-    const created = await Author.create(authorData);
-    return created;
+    const createdAuthor = await Author.create(authorData);
+    return createdAuthor;
   } catch (e) {
     if (e.message.includes('validation failed')) {
       throw new BadDataError(e.message);
