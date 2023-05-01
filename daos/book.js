@@ -110,8 +110,20 @@ module.exports.updateById = async (bookId, newObj) => {
   if (!mongoose.Types.ObjectId.isValid(bookId)) {
     return false;
   }
-  await Book.updateOne({ _id: bookId }, newObj);
-  return true;
+  // added same logic in 'module.exports.create' to handle same validation and duplicate key errors
+  try {
+    await Book.updateOne({ _id: bookId }, newObj);
+    return true;
+  } catch (e) {
+    // console.log('DAOS - e.message')
+    // console.log(e.message)
+    if (e.message.includes('validation failed')) {
+      throw new BadDataError(e.message);
+    } else if (e.message.includes('duplicate key')) {
+      throw new BadDataError(e.message);
+    }
+    throw e;
+  }
 };
 
 module.exports.create = async (bookData) => {
