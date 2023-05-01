@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const Book = require('../models/book');
+const Author = require('../models/author');
 
 module.exports = {};
 
@@ -56,8 +57,9 @@ module.exports.getSearch = async (page, perPage, searchQuery) => {
   return null;
 };
 
-module.exports.getStats = async () => {
-  const statsByAuthor = Book.aggregate([
+module.exports.getStats = async (page, perPage, authorInfoQuery) => {
+  let statsByAuthor;
+  statsByAuthor = await Book.aggregate([
     {
       $group: {
         _id: '$authorId', // Group key
@@ -78,6 +80,17 @@ module.exports.getStats = async () => {
     },
   ]);
 
+  // Update array of objects to includes the authorInfo if authorInfo query is true
+  if (authorInfoQuery === 'true') {
+    const updateWithAuthorInfo = statsByAuthor.map(async (authorStat) => {
+      // retrieve authorInfo from Author db
+      const authorInfo = await Author.findOne({ _id: authorStat.authorId });
+      // convert from mongoose doc to js object and add author field
+      authorStat.author = authorInfo.toObject();
+      return authorStat;
+    });
+    statsByAuthor = await Promise.all(updateWithAuthorInfo);
+  }
   return statsByAuthor;
 };
 

@@ -52,9 +52,15 @@ router.get("/", async (req, res, next) => {
 // Stats
 router.get("/authors/stats", async (req, res, next) => {
   console.log('get /authors/stats')
-  const statsByAuthor = await bookDAO.getStats();
-  console.log('statsByAuthor')
-  console.log(statsByAuthor)
+  let { page, perPage } = req.query;
+  const authorInfoQuery = req.query.authorInfo;
+  // console.log('authorInfoQuery')
+  // console.log(authorInfoQuery)
+  page = page ? Number(page) : 0;
+  perPage = perPage ? Number(perPage) : 10;
+  const statsByAuthor = await bookDAO.getStats(page, perPage, authorInfoQuery);
+  // console.log('statsByAuthor')
+  // console.log(statsByAuthor)
   res.json(statsByAuthor);
 })
 
