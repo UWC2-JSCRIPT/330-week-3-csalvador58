@@ -85,8 +85,12 @@ module.exports.getStats = async (page, perPage, authorInfoQuery) => {
     const updateWithAuthorInfo = statsByAuthor.map(async (authorStat) => {
       // retrieve authorInfo from Author db
       const authorInfo = await Author.findOne({ _id: authorStat.authorId });
-      // convert from mongoose doc to js object and add author field
-      authorStat.author = authorInfo.toObject();
+      if (authorInfo) {
+        // convert from mongoose doc to js object and add author field
+        authorStat.author = authorInfo.toObject();
+      } else {
+        authorStat.author = "Info Not available";
+      }
       return authorStat;
     });
     statsByAuthor = await Promise.all(updateWithAuthorInfo);
@@ -115,7 +119,11 @@ module.exports.create = async (bookData) => {
     const createdBook = await Book.create(bookData);
     return createdBook;
   } catch (e) {
+    // console.log('DAOS - e.message')
+    // console.log(e.message)
     if (e.message.includes('validation failed')) {
+      throw new BadDataError(e.message);
+    } else if (e.message.includes('duplicate key')) {
       throw new BadDataError(e.message);
     }
     throw e;

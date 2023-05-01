@@ -15,24 +15,46 @@ router.post("/", async (req, res, next) => {
       res.json(savedBook); 
     } catch(e) {
       if (e instanceof bookDAO.BadDataError) {
+        // console.log('400 e.message')
+        // console.log(e.message)
         res.status(400).send(e.message);
       } else {
+        // console.log('500 e.message')
+        // console.log(e.message)
         res.status(500).send(e.message);
       }
     }
   }
 });
 
+// Search
+router.get("/search", async (req, res, next) => {
+  console.log('get /search')
+  let { page, perPage } = req.query;
+  const searchQuery = req.query.query;
+  // console.log('searchQuery')
+  // console.log(searchQuery)
+
+  page = page ? Number(page) : 0;
+  perPage = perPage ? Number(perPage) : 10;
+  const books = await bookDAO.getSearch(page, perPage, searchQuery);
+  if(books.length > 0) {
+    res.json(books);
+  } else {
+    res.status(500).send("No book was found");
+  }
+});
+
 // // Read - single book
-// router.get("/:id", async (req, res, next) => {
-//   console.log('get :id')
-//   const book = await bookDAO.getById(req.params.id);
-//   if (book) {
-//     res.json(book);
-//   } else {
-//     res.sendStatus(404);
-//   }
-// });
+router.get("/:id", async (req, res, next) => {
+  console.log('get :id')
+  const book = await bookDAO.getById(req.params.id);
+  if (book) {
+    res.json(book);
+  } else {
+    res.sendStatus(404);
+  }
+});
 
 // Read - all books
 router.get("/", async (req, res, next) => {
@@ -63,24 +85,6 @@ router.get("/authors/stats", async (req, res, next) => {
   // console.log(statsByAuthor)
   res.json(statsByAuthor);
 })
-
-// Search
-router.get("/search", async (req, res, next) => {
-  console.log('get /search')
-  let { page, perPage } = req.query;
-  const searchQuery = req.query.query;
-  // console.log('searchQuery')
-  // console.log(searchQuery)
-
-  page = page ? Number(page) : 0;
-  perPage = perPage ? Number(perPage) : 10;
-  const books = await bookDAO.getSearch(page, perPage, searchQuery);
-  if(books.length > 0) {
-    res.json(books);
-  } else {
-    res.status(500).send("No book was found");
-  }
-});
 
 // Update
 router.put("/:id", async (req, res, next) => {
