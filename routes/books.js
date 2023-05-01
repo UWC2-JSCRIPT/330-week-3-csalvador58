@@ -5,7 +5,7 @@ const bookDAO = require('../daos/book');
 
 // Create
 router.post("/", async (req, res, next) => {
-  console.log('post /')
+  // console.log('post /')
   const book = req.body;
   if (!book || JSON.stringify(book) === '{}' ) {
     res.status(400).send('book is required');
@@ -29,7 +29,7 @@ router.post("/", async (req, res, next) => {
 
 // Search
 router.get("/search", async (req, res, next) => {
-  console.log('get /search')
+  // console.log('get /search')
   let { page, perPage } = req.query;
   const searchQuery = req.query.query;
   // console.log('searchQuery')
@@ -47,7 +47,7 @@ router.get("/search", async (req, res, next) => {
 
 // // Read - single book
 router.get("/:id", async (req, res, next) => {
-  console.log('get :id')
+  // console.log('get :id')
   const book = await bookDAO.getById(req.params.id);
   if (book) {
     res.json(book);
@@ -58,7 +58,7 @@ router.get("/:id", async (req, res, next) => {
 
 // Read - all books
 router.get("/", async (req, res, next) => {
-  console.log('get /')
+  // console.log('get /')
   let { page, perPage } = req.query;
   let query = req.query.authorId ? req.query.authorId : null;
   // console.log('query')
@@ -73,7 +73,7 @@ router.get("/", async (req, res, next) => {
 
 // Stats
 router.get("/authors/stats", async (req, res, next) => {
-  console.log('get /authors/stats')
+  // console.log('get /authors/stats')
   let { page, perPage } = req.query;
   const authorInfoQuery = req.query.authorInfo;
   // console.log('authorInfoQuery')
@@ -88,7 +88,7 @@ router.get("/authors/stats", async (req, res, next) => {
 
 // Update
 router.put("/:id", async (req, res, next) => {
-  console.log('put :id')
+  // console.log('put :id')
   const bookId = req.params.id;
   const book = req.body;
   if (!book || JSON.stringify(book) === '{}' ) {
@@ -109,7 +109,7 @@ router.put("/:id", async (req, res, next) => {
 
 // Delete
 router.delete("/:id", async (req, res, next) => {
-  console.log('delete :id')
+  // console.log('delete :id')
   const bookId = req.params.id;
   try {
     const success = await bookDAO.deleteById(bookId);
