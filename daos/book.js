@@ -12,6 +12,8 @@ module.exports.getAll = async (page, perPage, query) => {
   // console.log(perPage);
   // console.log('DAOS - query');
   // console.log(query);
+
+  // handle author query if exists, else return all books
   if (query) {
     // console.log('Process query');
     const books = await Book.find({ authorId: query })
@@ -61,16 +63,16 @@ module.exports.getStats = async (page, perPage, authorInfoQuery) => {
   let statsByAuthor;
   statsByAuthor = await Book.aggregate([
     {
-      $group: {
-        _id: '$authorId', // Group key
+      $group: { // create group stage in aggregation
+        _id: '$authorId', // Group key used to group documents
         averagePageCount: { $avg: '$pageCount' }, // use $avg accumulator operator for average
         numBooks: { $count: {} }, // use $count accumulator operator to total documents in group
-        titles: { $push: '$title' }, // use $push accumulator op to include array of titles
+        titles: { $push: '$title' }, // use $push accumulator op to include array of titles in group
       },
     },
     {
       $project: {
-        // project to specify fields to include/remove
+        // project is used to specify fields to include/remove
         _id: 0, // remove _id field
         authorId: '$_id', // update _id to authorId
         averagePageCount: 1, // include field
@@ -80,7 +82,7 @@ module.exports.getStats = async (page, perPage, authorInfoQuery) => {
     },
   ]);
 
-  // Update array of objects to includes the authorInfo if authorInfo query is true
+  // Update array of objects to include the authorInfo if authorInfo query is true
   if (authorInfoQuery === 'true') {
     const updateWithAuthorInfo = statsByAuthor.map(async (authorStat) => {
       // retrieve authorInfo from Author db
